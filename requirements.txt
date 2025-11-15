@@ -3,3 +3,4 @@ Flask_Cors
 openai
 requests
 google-generativeai
+dotenv
