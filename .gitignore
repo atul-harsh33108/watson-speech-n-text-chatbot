@@ -130,4 +130,4 @@ dmypy.json
 
 models/
 test_openai.py
-test_gemini.py
+#test_gemini.py
