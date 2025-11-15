@@ -2,4 +2,4 @@ Flask
 Flask_Cors
 openai
 requests
-google-generative-ai
+google-generativeai
