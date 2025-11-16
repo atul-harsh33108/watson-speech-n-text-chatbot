@@ -66,8 +66,20 @@ import base64
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-load_dotenv()
+# CRITICAL FIX: Tell dotenv exactly where .env is
+load_dotenv(dotenv_path='/opt/chatbot/.env')
+
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+
+def gemini_process_message(user_message):
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    prompt = "Act like a personal assistant. You can respond to questions, translate sentences, summarize news, and give recommendations."
+    try:
+        response = model.generate_content(prompt + "\n\n" + user_message)
+        return response.text.strip()
+    except Exception as e:
+        print(f"Gemini error: {e}")
+        return "Sorry, I couldn't process that."
 
 def speech_to_text(audio_binary):
     # STUB – voice not enabled yet
