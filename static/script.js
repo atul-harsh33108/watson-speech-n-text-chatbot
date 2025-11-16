@@ -36,14 +36,18 @@ const getSpeechToText = async (userRecording) => {
   return response.text;
 };
 
-const processUserMessage = async (userMessage) => {
-  let response = await fetch(baseUrl + "/process-message", {
+const processUserMessage = async (userMessage, isVoice = false) => {
+  const endpoint = isVoice ? "/process-message" : "/chat";
+  const payload = isVoice 
+    ? { userMessage, voice: voiceOption }
+    : { userMessage, voice: voiceOption };  // same for now
+
+  let response = await fetch(baseUrl + endpoint, {
     method: "POST",
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify({ userMessage: userMessage, voice: voiceOption }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
   response = await response.json();
-  console.log(response);
   return response;
 };
 
@@ -149,9 +153,9 @@ const populateUserMessage = (userMessage, userRecording) => {
   scrollToBottom();
 };
 
-const populateBotResponse = async (userMessage) => {
+const populateBotResponse = async (userMessage, isVoice = false) => {
   await showBotLoadingAnimation();
-  const response = await processUserMessage(userMessage);
+  const response = await processUserMessage(userMessage, isVoice);
   responses.push(response);
 
   const repeatButtonID = getRandomID();
@@ -180,7 +184,7 @@ $(document).ready(function () {
       const message = inputVal;
 
       populateUserMessage(message, null);
-      populateBotResponse(message);
+      populateBotResponse(message, false);
     }
 
     inputVal = $("#message-input").val();
@@ -211,7 +215,7 @@ $(document).ready(function () {
         await showUserLoadingAnimation();
         const userMessage = await getSpeechToText(userRecording);
         populateUserMessage(userMessage, userRecording);
-        populateBotResponse(userMessage);
+        populateBotResponse(userMessage, true);
       });
       $(".fa-microphone").css("color", "#125ee5");
       recording = false;
@@ -220,7 +224,7 @@ $(document).ready(function () {
       const message = cleanTextInput($("#message-input").val());
 
       populateUserMessage(message, null);
-      populateBotResponse(message);
+      populateBotResponse(message, false);
 
       $("#send-button")
         .removeClass("send")
